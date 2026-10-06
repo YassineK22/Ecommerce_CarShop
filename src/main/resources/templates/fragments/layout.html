@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:text="${title} + ' — AutoHub'">AutoHub</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<header th:fragment="header" class="site-header">
+    <div class="container header-inner">
+        <a class="logo" th:href="@{/}">AutoHub</a>
+        <nav class="nav">
+            <a th:href="@{/}">Accueil</a>
+            <a sec:authorize="isAnonymous()" th:href="@{/login}">Connexion</a>
+            <a sec:authorize="isAnonymous()" th:href="@{/register}">Inscription</a>
+            <a sec:authorize="isAuthenticated()" th:href="@{/profile}">Mon profil</a>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="logout-form">
+                <button type="submit">Déconnexion</button>
+            </form>
+        </nav>
+    </div>
+</header>
+</body>
+</html>

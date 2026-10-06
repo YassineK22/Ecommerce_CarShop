@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mon profil')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main class="container">
+    <div class="card">
+        <h1>Mon profil</h1>
+
+        <p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+
+        <form th:action="@{/profile}" th:object="${profileForm}" method="post">
+            <label for="name">Nom</label>
+            <input id="name" th:field="*{name}" type="text" required/>
+            <p class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+
+            <label for="email">Email</label>
+            <input id="email" th:field="*{email}" type="email" required/>
+            <p class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+
+            <h2>Changer le mot de passe (optionnel)</h2>
+            <p class="hint">Laissez vide si vous ne souhaitez pas le modifier.</p>
+
+            <label for="currentPassword">Mot de passe actuel</label>
+            <input id="currentPassword" th:field="*{currentPassword}" type="password" autocomplete="current-password"/>
+            <p class="field-error" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></p>
+
+            <label for="newPassword">Nouveau mot de passe</label>
+            <input id="newPassword" th:field="*{newPassword}" type="password" autocomplete="new-password"/>
+            <p class="field-error" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></p>
+
+            <label for="confirmNewPassword">Confirmer le nouveau mot de passe</label>
+            <input id="confirmNewPassword" th:field="*{confirmNewPassword}" type="password" autocomplete="new-password"/>
+            <p class="field-error" th:if="${#fields.hasErrors('confirmNewPassword')}" th:errors="*{confirmNewPassword}"></p>
+
+            <button type="submit">Enregistrer</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

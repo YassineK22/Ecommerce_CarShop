@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Inscription')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main class="container">
+    <div class="card">
+        <h1>Inscription</h1>
+
+        <form th:action="@{/register}" th:object="${registrationForm}" method="post">
+            <label for="name">Nom</label>
+            <input id="name" th:field="*{name}" type="text" required/>
+            <p class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+
+            <label for="email">Email</label>
+            <input id="email" th:field="*{email}" type="email" required/>
+            <p class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+
+            <label for="password">Mot de passe</label>
+            <input id="password" th:field="*{password}" type="password" required/>
+            <p class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+
+            <label for="confirmPassword">Confirmer le mot de passe</label>
+            <input id="confirmPassword" th:field="*{confirmPassword}" type="password" required/>
+            <p class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></p>
+
+            <button type="submit">Créer mon compte</button>
+        </form>
+
+        <p class="hint">Déjà inscrit ? <a th:href="@{/login}">Se connecter</a></p>
+    </div>
+</main>
+</body>
+</html>

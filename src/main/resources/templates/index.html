@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Accueil')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main class="container">
+    <div class="card">
+        <h1>Bienvenue sur AutoHub</h1>
+        <p>Marketplace de voitures d'occasion — module Comptes &amp; Authentification (M1).</p>
+
+        <p th:if="${param.registered}" class="alert alert-success">
+            Inscription réussie. Vous pouvez vous connecter.
+        </p>
+        <p th:if="${param.logout}" class="alert alert-success">
+            Vous êtes déconnecté.
+        </p>
+
+        <p sec:authorize="isAnonymous()">
+            <a class="btn" th:href="@{/register}">Créer un compte</a>
+            <a class="btn" th:href="@{/login}">Se connecter</a>
+        </p>
+        <p sec:authorize="isAuthenticated()">
+            Connecté en tant que <strong sec:authentication="name"></strong>.
+            <a th:href="@{/profile}">Gérer mon profil</a>
+        </p>
+    </div>
+</main>
+</body>
+</html>
