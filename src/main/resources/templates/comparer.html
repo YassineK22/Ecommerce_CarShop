@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Comparer les annonces')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main class="container-wide">
+
+    <div class="page-header" style="margin-top:1.5rem">
+        <h1 style="margin-bottom:0">⚖️ Comparer les annonces</h1>
+        <a class="btn btn-secondary" th:href="@{/annonces}">← Retour aux annonces</a>
+    </div>
+
+    <div class="card" style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+            <tbody>
+            <tr>
+                <th style="text-align:left;padding:.7rem .6rem">Photo</th>
+                <td th:each="annonce : ${annonces}" style="padding:.7rem .6rem;text-align:center">
+                    <img th:if="${!#lists.isEmpty(annonce.photos)}" th:src="${annonce.photos[0]}"
+                         alt="Photo du véhicule" class="annonce-thumb" style="max-width:180px"/>
+                    <span th:if="${#lists.isEmpty(annonce.photos)}" class="hint">Pas de photo</span>
+                </td>
+            </tr>
+            <tr style="border-top:1px solid #e2e8f0">
+                <th style="text-align:left;padding:.7rem .6rem">Annonce</th>
+                <td th:each="annonce : ${annonces}" style="padding:.7rem .6rem;text-align:center">
+                    <a th:href="@{/annonces/{id}(id=${annonce.id})}" th:text="${annonce.title}">Titre</a>
+                </td>
+            </tr>
+            <tr style="border-top:1px solid #e2e8f0">
+                <th style="text-align:left;padding:.7rem .6rem">Marque</th>
+                <td th:each="annonce : ${annonces}" style="padding:.7rem .6rem;text-align:center"
+                    th:text="${annonce.make}">Marque</td>
+            </tr>
+            <tr style="border-top:1px solid #e2e8f0">
+                <th style="text-align:left;padding:.7rem .6rem">Modèle</th>
+                <td th:each="annonce : ${annonces}" style="padding:.7rem .6rem;text-align:center"
+                    th:text="${annonce.model}">Modèle</td>
+            </tr>
+            <tr style="border-top:1px solid #e2e8f0">
+                <th style="text-align:left;padding:.7rem .6rem">Année</th>
+                <td th:each="annonce : ${annonces}" style="padding:.7rem .6rem;text-align:center"
+                    th:text="${annonce.year}">2020</td>
+            </tr>
+            <tr style="border-top:1px solid #e2e8f0">
+                <th style="text-align:left;padding:.7rem .6rem">Kilométrage</th>
+                <td th:each="annonce : ${annonces}" style="padding:.7rem .6rem;text-align:center"
+                    th:text="${#numbers.formatInteger(annonce.mileage, 0, 'POINT')} + ' km'">0 km</td>
+            </tr>
+            <tr style="border-top:1px solid #e2e8f0">
+                <th style="text-align:left;padding:.7rem .6rem">Prix</th>
+                <td th:each="annonce : ${annonces}" style="padding:.7rem .6rem;text-align:center">
+                    <strong class="annonce-price"
+                            th:text="${#numbers.formatDecimal(annonce.price, 1, 'POINT', 2, 'COMMA')} + ' DT'">0 DT</strong>
+                </td>
+            </tr>
+            <tr style="border-top:1px solid #e2e8f0">
+                <th style="text-align:left;padding:.7rem .6rem">Type</th>
+                <td th:each="annonce : ${annonces}" style="padding:.7rem .6rem;text-align:center">
+                    <span class="badge"
+                          th:classappend="${annonce.type.name() == 'ENCHERE'} ? 'badge-enchere' : 'badge-prix'"
+                          th:text="${annonce.type.name() == 'ENCHERE'} ? '🔨 Enchère' : '🏷️ Prix fixe'"></span>
+                </td>
+            </tr>
+            <tr style="border-top:1px solid #e2e8f0">
+                <th style="text-align:left;padding:.7rem .6rem">Vendeur</th>
+                <td th:each="annonce : ${annonces}" style="padding:.7rem .6rem;text-align:center"
+                    th:text="${annonce.seller.name}">Vendeur</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+</body>
+</html>

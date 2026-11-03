@@ -1,0 +1,76 @@
+AutoHub — Spécification du projet 
+Projet Java / Spring Boot — Marketplace et enchères de voitures 
+1. Description générale du projet 
+AutoHub est une plateforme web de vente et d'achat de voitures d'occasion. Contrairement à un e-commerce classique 
+avec panier et paiement, AutoHub propose deux types d'annonces : une annonce à prix fixe et une annonce en enchère, 
+avec une date limite et un gagnant désigné au plus offrant. Tout utilisateur inscrit peut publier une annonce, consulter les 
+annonces, enchérir, mettre une annonce en favoris et contacter un vendeur. 
+2. Modules du projet 
+Module Nom Description 
+M1 Comptes & Authentification Inscription, connexion, gestion des rôles 
+M2 Annonces Création, modification, suppression, recherche et filtres des 
+annonces 
+M3 Enchères Système d'offres sur les annonces de type enchère, clôture 
+automatique 
+M4 Interactions Favoris, contact vendeur, comparaison d'annonces 
+M5 Administration Modération des annonces et gestion des comptes utilisateurs 
+3. Fonctionnalités des modules 
+M1 — Comptes & Authentification 
+- S'inscrire / se connecter / se déconnecter 
+- Gérer son profil (nom, email, mot de passe) 
+- Gestion des rôles (Spring Security) 
+M2 — Annonces 
+- Publier une annonce (prix fixe ou enchère, upload de photos) 
+- Modifier / supprimer sa propre annonce 
+- Rechercher et filtrer les annonces (marque, prix, année, kilométrage) 
+- Consulter le détail d'une annonce 
+M3 — Enchères 
+- Placer une offre sur une annonce de type enchère 
+- Consulter l'historique des offres et la meilleure offre actuelle 
+- Clôture automatique à la date limite et détermination du gagnant 
+M4 — Interactions 
+- Ajouter / retirer une annonce des favoris 
+- Contacter le vendeur 
+- Comparer deux ou trois annonces (fonctionnalité bonus) 
+M5 — Administration 
+- Supprimer une annonce signalée 
+- Activer / désactiver un compte utilisateur 
+- Consulter un tableau de bord simple (nombre d'annonces, d'utilisateurs) 
+4. Acteurs du projet 
+--- PAGE ---
+- Visiteur (non connecté) — consultation uniquement 
+- Utilisateur inscrit — peut publier une annonce, enchérir, acheter, mettre en favoris 
+- Administrateur — modère la plateforme 
+5. Attribution des fonctionnalités aux acteurs 
+Fonctionnalité Visiteur Utilisateur Admin 
+Consulter / rechercher les annonces Oui Oui Oui 
+S'inscrire / se connecter Oui — — 
+Publier / modifier / supprimer sa propre annonce Non Oui Oui (toute 
+annonce) 
+Enchérir Non Oui Non 
+Ajouter aux favoris / contacter un vendeur Non Oui Non 
+Modérer les annonces / gérer les comptes Non Non Oui 
+6. Workflows 
+Inscription / Connexion 
+1. Le visiteur remplit le formulaire d'inscription → un compte est créé (rôle Utilisateur) 
+2. Connexion → session gérée via Spring Security → accès aux fonctionnalités réservées aux utilisateurs 
+Cycle de vie d'une enchère 
+1. L'utilisateur publie une annonce avec le type « Enchère » et une date de fin 
+2. Les autres utilisateurs placent des offres, chaque offre devant dépasser la précédente 
+3. À la date de fin, une tâche planifiée (@Scheduled) clôture automatiquement l'enchère et désigne le plus offrant 
+comme gagnant 
+4. Le vendeur et le gagnant sont notifiés 
+7. Mise en place du dépôt (GitHub / GitLab) 
+- Création d'un dépôt (ex. autohub-marketplace) avec un .gitignore Java/Maven et un README reprenant la 
+description du projet 
+- Deux branches principales : main (stable) et dev (travail quotidien) 
+- Une issue par fonctionnalité, regroupées par module (labels M1 à M5), suivies sur un tableau (To Do / In Progress / 
+Done) 
+- Répartition des modules entre les deux membres, travail sur des branches de fonctionnalité (ex. feature/M3-
+encheres), fusionnées dans dev via pull request 
+- Fusion dev → main uniquement lorsqu'un module est stable pour la démonstration 
+Note technique 
+Spring Boot et Thymeleaf couvrent l'essentiel des pages (annonces, formulaires, profil). Quelques endpoints REST 
+(/api/...) gèrent les parties dynamiques : soumission d'une offre, rafraîchissement de la meilleure offre, filtres de 
+recherche. Un composant React ponctuel (ex. widget d'enchère) peut être ajouté si l'enseignante le demande, sans 
+reconstruire toute l'interface. 

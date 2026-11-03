@@ -3,7 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.dto.RegistrationForm;
 import com.example.demo.service.UserService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,10 +13,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
-@RequiredArgsConstructor
 public class AuthController {
 
-	private final UserService userService;
+	@Autowired
+	private UserService userService;
 
 	@GetMapping("/login")
 	public String loginPage() {
@@ -24,7 +25,7 @@ public class AuthController {
 
 	@GetMapping("/register")
 	public String registerForm(Model model) {
-		model.addAttribute("registrationForm", new RegistrationForm());
+		model.addAttribute("registrationForm", new RegistrationForm(null, null, null, null));
 		return "register";
 	}
 
@@ -37,7 +38,7 @@ public class AuthController {
 			bindingResult.rejectValue("confirmPassword", "match", "Les mots de passe ne correspondent pas");
 		}
 
-		if (!bindingResult.hasErrors() && userService.isEmailTaken(form.getEmail())) {
+		if (!bindingResult.hasErrors() && userService.isEmailTaken(form.email())) {
 			bindingResult.rejectValue("email", "unique", "Cet email est déjà utilisé");
 		}
 
@@ -45,7 +46,13 @@ public class AuthController {
 			return "register";
 		}
 
-		userService.register(form);
+		try {
+			userService.register(form);
+		} catch (DataIntegrityViolationException ex) {
+			// Deux inscriptions simultanées sur le même email : la contrainte unique tranche
+			bindingResult.rejectValue("email", "unique", "Cet email est déjà utilisé");
+			return "register";
+		}
 		return "redirect:/login?registered";
 	}
 }

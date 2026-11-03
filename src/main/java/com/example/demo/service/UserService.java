@@ -5,24 +5,25 @@ import com.example.demo.dto.RegistrationForm;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
-	private final UserRepository userRepository;
-	private final PasswordEncoder passwordEncoder;
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@Transactional
 	public User register(RegistrationForm form) {
 		User user = new User();
-		user.setName(form.getName().trim());
-		user.setEmail(form.getEmail().trim().toLowerCase());
-		user.setPassword(passwordEncoder.encode(form.getPassword()));
+		user.setName(form.name().trim());
+		user.setEmail(form.email().trim().toLowerCase());
+		user.setPassword(passwordEncoder.encode(form.password()));
 		user.setRole(Role.UTILISATEUR);
 		return userRepository.save(user);
 	}
@@ -38,11 +39,11 @@ public class UserService {
 
 	@Transactional
 	public void updateProfile(User user, ProfileForm form) {
-		user.setName(form.getName().trim());
-		user.setEmail(form.getEmail().trim().toLowerCase());
+		user.setName(form.name().trim());
+		user.setEmail(form.email().trim().toLowerCase());
 
-		if (form.getNewPassword() != null && !form.getNewPassword().isBlank()) {
-			user.setPassword(passwordEncoder.encode(form.getNewPassword()));
+		if (form.newPassword() != null && !form.newPassword().isBlank()) {
+			user.setPassword(passwordEncoder.encode(form.newPassword()));
 		}
 
 		userRepository.save(user);

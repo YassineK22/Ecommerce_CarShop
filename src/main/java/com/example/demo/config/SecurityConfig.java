@@ -1,9 +1,10 @@
 package com.example.demo.config;
 
 import com.example.demo.service.CustomUserDetailsService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,16 +13,19 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
-	private final CustomUserDetailsService userDetailsService;
+	@Autowired
+	private CustomUserDetailsService userDetailsService;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/", "/register", "/login", "/css/**", "/error", "/h2-console/**").permitAll()
+						.requestMatchers("/", "/register", "/login", "/css/**", "/uploads/**", "/error").permitAll()
+						.requestMatchers(HttpMethod.GET, "/annonces", "/annonces/*").permitAll()
+						.requestMatchers(HttpMethod.GET, "/comparer").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/annonces/*/meilleure-offre").permitAll()
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						.anyRequest().authenticated())
 				.userDetailsService(userDetailsService)
@@ -33,7 +37,6 @@ public class SecurityConfig {
 						.logoutUrl("/logout")
 						.logoutSuccessUrl("/?logout")
 						.permitAll())
-				.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
 				.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
 		return http.build();

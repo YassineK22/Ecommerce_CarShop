@@ -1,0 +1,6 @@
+# Copy to application-local.properties (gitignored) or set these as environment variables.
+# spring.config.import=optional:classpath:application-local.properties
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/autohub
+spring.datasource.username=postgres
+spring.datasource.password=CHANGE_ME

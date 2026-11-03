@@ -4,27 +4,31 @@
 <body>
 <header th:replace="~{fragments/layout :: header}"></header>
 <main class="container">
-    <div class="card">
-        <h1>Connexion</h1>
+    <div class="card" style="max-width:440px;margin:0 auto">
+        <h1 style="text-align:center;margin-bottom:1.5rem">🔑 Connexion</h1>
 
         <p th:if="${param.error}" class="alert alert-error">
             Email ou mot de passe incorrect.
         </p>
         <p th:if="${param.registered}" class="alert alert-success">
-            Compte créé. Connectez-vous avec votre email.
+            Compte créé ! Connectez-vous maintenant.
         </p>
 
         <form th:action="@{/login}" method="post">
             <label for="username">Email</label>
-            <input id="username" name="username" type="email" autocomplete="username" required/>
+            <input id="username" name="username" type="email" autocomplete="username"
+                   required placeholder="votre@email.com"/>
 
             <label for="password">Mot de passe</label>
-            <input id="password" name="password" type="password" autocomplete="current-password" required/>
+            <input id="password" name="password" type="password" autocomplete="current-password"
+                   required placeholder="••••••••"/>
 
-            <button type="submit">Se connecter</button>
+            <button type="submit" style="width:100%;margin-top:.25rem">Se connecter</button>
         </form>
 
-        <p class="hint">Pas encore de compte ? <a th:href="@{/register}">S'inscrire</a></p>
+        <p class="hint" style="text-align:center;margin-top:1rem">
+            Pas encore de compte ? <a th:href="@{/register}">S'inscrire</a>
+        </p>
     </div>
 </main>
 </body>

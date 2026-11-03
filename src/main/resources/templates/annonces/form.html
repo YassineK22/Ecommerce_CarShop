@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(title=${formTitle})}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main class="container">
+
+    <p style="margin-top:1.5rem"><a th:href="@{/annonces}">← Retour aux annonces</a></p>
+
+    <div class="card">
+        <h1 th:text="${formTitle}">Formulaire</h1>
+
+        <form th:action="${annonce != null} ? @{|/annonces/${annonce.id}/edit|} : @{/annonces}"
+              th:object="${annonceForm}"
+              method="post"
+              enctype="multipart/form-data">
+
+            <!-- Erreurs globales (ex. format de photo refusé) -->
+            <p class="field-error" th:each="erreur : ${#fields.globalErrors()}" th:text="${erreur}"></p>
+
+            <label for="title">Titre *</label>
+            <input id="title" th:field="*{title}" type="text" required placeholder="ex. Renault Clio 2019 — parfait état"/>
+            <p class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+
+            <label for="description">Description *</label>
+            <textarea id="description" th:field="*{description}" rows="5" required
+                      placeholder="Décrivez l'état du véhicule, l'historique d'entretien, les options…"></textarea>
+            <p class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 1rem">
+                <div>
+                    <label for="make">Marque *</label>
+                    <input id="make" th:field="*{make}" type="text" required placeholder="ex. Renault"/>
+                    <p class="field-error" th:if="${#fields.hasErrors('make')}" th:errors="*{make}"></p>
+                </div>
+                <div>
+                    <label for="model">Modèle *</label>
+                    <input id="model" th:field="*{model}" type="text" required placeholder="ex. Clio"/>
+                    <p class="field-error" th:if="${#fields.hasErrors('model')}" th:errors="*{model}"></p>
+                </div>
+                <div>
+                    <label for="year">Année *</label>
+                    <input id="year" th:field="*{year}" type="number" min="1900" max="2100" required placeholder="2019"/>
+                    <p class="field-error" th:if="${#fields.hasErrors('year')}" th:errors="*{year}"></p>
+                </div>
+                <div>
+                    <label for="mileage">Kilométrage (km) *</label>
+                    <input id="mileage" th:field="*{mileage}" type="number" min="0" required placeholder="45000"/>
+                    <p class="field-error" th:if="${#fields.hasErrors('mileage')}" th:errors="*{mileage}"></p>
+                </div>
+                <div>
+                    <label for="price">Prix (DT) *</label>
+                    <input id="price" th:field="*{price}" type="number" step="0.01" min="0" required placeholder="8500"/>
+                    <p class="field-error" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></p>
+                </div>
+                <div>
+                    <label for="type">Type d'annonce *</label>
+                    <select id="type" th:field="*{type}" required>
+                        <option value="" disabled>Choisir…</option>
+                        <option th:each="t : ${T(com.example.demo.entity.TypeAnnonce).values()}"
+                                th:value="${t}"
+                                th:text="${t.name() == 'PRIX_FIXE'} ? '🏷️ Prix fixe' : '🔨 Enchère'">type</option>
+                    </select>
+                    <p class="field-error" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></p>
+                </div>
+            </div>
+
+            <label for="auctionEndDate">Date de fin (enchère uniquement)</label>
+            <input id="auctionEndDate" th:field="*{auctionEndDate}" type="datetime-local"/>
+            <p class="hint">Obligatoire si le type est « Enchère ». Le système clôturera automatiquement l'enchère à cette date (M3).</p>
+            <p class="field-error" th:if="${#fields.hasErrors('auctionEndDate')}" th:errors="*{auctionEndDate}"></p>
+
+            <label for="photos">Photos</label>
+            <input id="photos" name="photos" type="file" accept="image/*" multiple style="cursor:pointer"/>
+            <p class="hint" th:if="${annonce != null}">Laissez vide pour conserver les photos existantes. Sélectionnez des fichiers pour en ajouter.</p>
+            <p class="hint" th:unless="${annonce != null}">Ajoutez au moins une image (PNG, JPG, WebP, max 5 Mo chacune).</p>
+            <p class="field-error" th:if="${#fields.hasErrors('photos')}" th:errors="*{photos}"></p>
+
+            <!-- Photos actuelles -->
+            <div th:if="${annonce != null and !#lists.isEmpty(annonce.photos)}" style="margin-bottom:1rem">
+                <p class="hint" style="margin-bottom:.5rem">Photos actuelles :</p>
+                <div class="photo-gallery photo-gallery-small">
+                    <img th:each="photo : ${annonce.photos}" th:src="${photo}" alt="Photo existante"/>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem">
+                <button type="submit" th:text="${submitLabel}">Enregistrer</button>
+                <a class="btn btn-secondary" th:href="@{/annonces}">Annuler</a>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

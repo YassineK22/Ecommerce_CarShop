@@ -13,8 +13,11 @@
         <a class="logo" th:href="@{/}">AutoHub</a>
         <nav class="nav">
             <a th:href="@{/}">Accueil</a>
+            <a th:href="@{/annonces}">Annonces</a>
             <a sec:authorize="isAnonymous()" th:href="@{/login}">Connexion</a>
             <a sec:authorize="isAnonymous()" th:href="@{/register}">Inscription</a>
+            <a sec:authorize="isAuthenticated()" th:href="@{/mes-favoris}">Mes favoris</a>
+            <a sec:authorize="isAuthenticated()" th:href="@{/mes-messages}">Mes messages</a>
             <a sec:authorize="isAuthenticated()" th:href="@{/profile}">Mon profil</a>
             <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="logout-form">
                 <button type="submit">Déconnexion</button>

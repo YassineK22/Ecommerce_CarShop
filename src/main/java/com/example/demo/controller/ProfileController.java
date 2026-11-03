@@ -4,7 +4,7 @@ import com.example.demo.dto.ProfileForm;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,16 +15,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequiredArgsConstructor
 public class ProfileController {
 
-	private final UserService userService;
+	@Autowired
+	private UserService userService;
 
 	@GetMapping("/profile")
 	public String profilePage(@AuthenticationPrincipal User user, Model model) {
-		ProfileForm form = new ProfileForm();
-		form.setName(user.getName());
-		form.setEmail(user.getEmail());
+		ProfileForm form = new ProfileForm(user.getName(), user.getEmail(), null, null, null);
 		model.addAttribute("profileForm", form);
 		return "profile";
 	}
@@ -37,12 +35,12 @@ public class ProfileController {
 			RedirectAttributes redirectAttributes) {
 
 		if (form.wantsPasswordChange()) {
-			if (form.getNewPassword().length() < 8) {
+			if (form.newPassword().length() < 8) {
 				bindingResult.rejectValue("newPassword", "size", "Le nouveau mot de passe doit contenir au moins 8 caractères");
 			}
-			if (form.getCurrentPassword() == null || form.getCurrentPassword().isBlank()) {
+			if (form.currentPassword() == null || form.currentPassword().isBlank()) {
 				bindingResult.rejectValue("currentPassword", "required", "Indiquez votre mot de passe actuel");
-			} else if (!userService.matchesPassword(user, form.getCurrentPassword())) {
+			} else if (!userService.matchesPassword(user, form.currentPassword())) {
 				bindingResult.rejectValue("currentPassword", "invalid", "Mot de passe actuel incorrect");
 			}
 			if (!form.isNewPasswordConfirmed()) {
@@ -50,7 +48,7 @@ public class ProfileController {
 			}
 		}
 
-		if (!bindingResult.hasErrors() && userService.isEmailTakenByOtherUser(form.getEmail(), user.getId())) {
+		if (!bindingResult.hasErrors() && userService.isEmailTakenByOtherUser(form.email(), user.getId())) {
 			bindingResult.rejectValue("email", "unique", "Cet email est déjà utilisé");
 		}
 

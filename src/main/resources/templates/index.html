@@ -5,25 +5,46 @@
 <body>
 <header th:replace="~{fragments/layout :: header}"></header>
 <main class="container">
-    <div class="card">
-        <h1>Bienvenue sur AutoHub</h1>
-        <p>Marketplace de voitures d'occasion — module Comptes &amp; Authentification (M1).</p>
+    <div class="card hero">
+        <h1>🚗 Bienvenue sur AutoHub</h1>
+        <p>La marketplace de voitures d'occasion — achetez, vendez ou misez aux enchères en toute confiance.</p>
 
-        <p th:if="${param.registered}" class="alert alert-success">
+        <div class="actions">
+            <a class="btn" th:href="@{/annonces}">Voir les annonces</a>
+            <a sec:authorize="isAnonymous()" class="btn btn-secondary" th:href="@{/register}">Créer un compte</a>
+            <a sec:authorize="isAnonymous()" class="btn btn-secondary" th:href="@{/login}">Se connecter</a>
+        </div>
+
+        <p th:if="${param.registered}" class="alert alert-success" style="margin-top:1.5rem">
             Inscription réussie. Vous pouvez vous connecter.
         </p>
-        <p th:if="${param.logout}" class="alert alert-success">
+        <p th:if="${param.logout}" class="alert alert-success" style="margin-top:1.5rem">
             Vous êtes déconnecté.
         </p>
 
-        <p sec:authorize="isAnonymous()">
-            <a class="btn" th:href="@{/register}">Créer un compte</a>
-            <a class="btn" th:href="@{/login}">Se connecter</a>
-        </p>
-        <p sec:authorize="isAuthenticated()">
-            Connecté en tant que <strong sec:authentication="name"></strong>.
+        <p sec:authorize="isAuthenticated()" style="margin-top:1.25rem; color:#64748b; font-size:.95rem">
+            Connecté en tant que <strong sec:authentication="name"></strong> &mdash;
             <a th:href="@{/profile}">Gérer mon profil</a>
         </p>
+    </div>
+
+    <div class="stats-strip">
+        <div class="stat-card">
+            <div class="stat-num">🚘</div>
+            <div class="stat-label">Toutes marques</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num">🔨</div>
+            <div class="stat-label">Enchères en direct</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num">🔒</div>
+            <div class="stat-label">Sécurisé</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num">📸</div>
+            <div class="stat-label">Photos HD</div>
+        </div>
     </div>
 </main>
 </body>

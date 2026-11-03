@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head(title=${annonce.title})}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main class="container-wide">
+
+    <p style="margin-top:1.5rem"><a th:href="@{/annonces}">← Retour aux annonces</a></p>
+
+    <p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+    <p th:if="${errorMessage}"   class="alert alert-error"   th:text="${errorMessage}"></p>
+
+    <div class="card">
+        <div class="detail-header">
+            <div>
+                <h1 th:text="${annonce.title}">Titre</h1>
+                <p class="annonce-meta">
+                    <strong th:text="${annonce.make + ' ' + annonce.model}"></strong> ·
+                    <span th:text="${annonce.year}"></span> ·
+                    <span th:text="${#numbers.formatInteger(annonce.mileage, 0, 'POINT')} + ' km'"></span>
+                </p>
+                <p class="annonce-price" th:text="${#numbers.formatDecimal(annonce.price, 1, 'POINT', 2, 'COMMA')} + ' DT'"></p>
+                <span class="badge"
+                      th:classappend="${annonce.type.name() == 'ENCHERE'} ? 'badge-enchere' : 'badge-prix'"
+                      th:text="${annonce.type.name() == 'ENCHERE'} ? '🔨 Enchère' : '🏷️ Prix fixe'"></span>
+
+                <!-- M4 : favoris -->
+                <div sec:authorize="isAuthenticated()" th:if="${!canManage}" style="margin-top:.8rem">
+                    <form th:action="@{/annonces/{id}/favori(id=${annonce.id})}" method="post" style="display:inline">
+                        <button type="submit" class="btn btn-secondary"
+                                th:text="${isFavori} ? '⭐ Retirer des favoris' : '☆ Ajouter aux favoris'">☆ Ajouter aux favoris</button>
+                    </form>
+                </div>
+
+                <p th:if="${annonce.type.name() == 'ENCHERE' and annonce.auctionEndDate != null}"
+                   class="hint" style="margin-top:.6rem">
+                    ⏰ Fin de l'enchère :
+                    <strong th:text="${#temporals.format(annonce.auctionEndDate, 'dd/MM/yyyy HH:mm')}"></strong>
+                    · Statut : <span th:text="${annonce.statutEnchere}"></span>
+                </p>
+            </div>
+            <div th:if="${canManage}" class="owner-actions">
+                <a class="btn" th:href="@{/annonces/{id}/edit(id=${annonce.id})}">✏️ Modifier</a>
+                <form th:action="@{/annonces/{id}/delete(id=${annonce.id})}" method="post">
+                    <button type="submit" class="btn btn-danger"
+                            onclick="return confirm('Supprimer cette annonce définitivement ?')">🗑️ Supprimer</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Photos -->
+        <div class="photo-gallery" th:if="${!#lists.isEmpty(annonce.photos)}">
+            <img th:each="photo : ${annonce.photos}" th:src="${photo}" alt="Photo de l'annonce"/>
+        </div>
+
+        <hr style="border:none;border-top:1px solid #e2e8f0;margin:1.25rem 0"/>
+
+        <h2>Description</h2>
+        <p style="white-space:pre-line" th:text="${annonce.description}">Description</p>
+
+        <!-- M3 : Enchères -->
+        <div th:if="${annonce.type.name() == 'ENCHERE'}" style="margin-top:1.25rem">
+            <hr style="border:none;border-top:1px solid #e2e8f0;margin:1.25rem 0"/>
+
+            <h2>Enchères</h2>
+            <p>
+                Meilleure offre actuelle :
+                <strong style="font-size:1.2em"
+                        th:text="${#numbers.formatDecimal(meilleureOffre, 1, 'POINT', 2, 'COMMA')} + ' DT'"></strong>
+                <span class="hint" th:if="${offres.isEmpty()}" style="margin-left:.4rem">
+                    (aucune offre — prix de départ)</span>
+                <span class="hint" th:unless="${offres.isEmpty()}" style="margin-left:.4rem">
+                    (offre de <span th:text="${offres.get(0).bidder.name}"></span>)</span>
+            </p>
+
+            <p th:if="${annonce.winner != null}" class="alert alert-success">
+                🏆 Vainqueur de l'enchère : <strong th:text="${annonce.winner.name}"></strong>
+            </p>
+
+            <!-- Formulaire d'enchère -->
+            <div sec:authorize="isAuthenticated()" th:if="${enchereOuverte and !canManage}"
+                 style="margin-top:1rem">
+                <form th:action="@{/annonces/{id}/offres(id=${annonce.id})}" method="post">
+                    <input type="number" name="amount" step="0.01"
+                           th:min="${montantMinimum}"
+                           placeholder="Votre offre" required/>
+                    <button type="submit" class="btn">🔨 Placer mon offre</button>
+                </form>
+                <p class="hint" style="margin-top:.4rem">
+                    L'offre doit être supérieure à
+                    <span th:text="${#numbers.formatDecimal(meilleureOffre, 1, 'POINT', 2, 'COMMA')} + ' DT'"></span>
+                </p>
+            </div>
+
+            <p sec:authorize="isAuthenticated()"
+               th:if="${canManage}"
+               class="hint" style="margin-top:1rem">
+                (C'est votre annonce — vous ne pouvez pas enchérir sur vos propres annonces.)
+            </p>
+
+            <p sec:authorize="!isAuthenticated()" th:if="${enchereOuverte}"
+               class="hint" style="margin-top:1rem">
+                <a th:href="@{/login}">Connectez-vous</a> pour enchérir.
+            </p>
+
+            <!-- Historique -->
+            <h3 style="margin-top:1.5rem">Historique des offres</h3>
+            <table th:if="${!offres.isEmpty()}" style="width:100%;max-width:560px;border-collapse:collapse">
+                <thead>
+                <tr style="text-align:left;border-bottom:1px solid #e2e8f0">
+                    <th>Enchérisseur</th>
+                    <th>Montant</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="o : ${offres}" style="border-bottom:1px solid #e2e8f0">
+                    <td th:text="${o.bidder.name}">Nom</td>
+                    <td th:text="${#numbers.formatDecimal(o.amount, 1, 'POINT', 2, 'COMMA')} + ' DT'">Montant</td>
+                    <td th:text="${#temporals.format(o.createdAt, 'dd/MM/yyyy HH:mm:ss')}">Date</td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="hint" th:if="${offres.isEmpty()}">Aucune offre pour le moment.</p>
+        </div>
+
+        <hr style="border:none;border-top:1px solid #e2e8f0;margin:1.25rem 0"/>
+
+        <h2>Vendeur</h2>
+        <p><strong th:text="${annonce.seller.name}">Nom</strong></p>
+        <p class="hint" th:text="${annonce.seller.email}">email</p>
+        <p class="hint" style="margin-top:.4rem">
+            Publiée le <span th:text="${#temporals.format(annonce.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+        </p>
+
+        <!-- M4 : contacter le vendeur -->
+        <hr style="border:none;border-top:1px solid #e2e8f0;margin:1.25rem 0"/>
+
+        <h2>Contacter le vendeur</h2>
+        <div sec:authorize="isAuthenticated()" th:if="${!canManage}">
+            <form th:action="@{/annonces/{id}/messages(id=${annonce.id})}" method="post">
+                <textarea name="contenu" rows="4" required maxlength="4000"
+                          style="width:100%;max-width:560px;padding:.6rem;border:1px solid #cbd5e1;border-radius:8px"
+                          placeholder="Bonjour, je suis intéressé par votre annonce…"></textarea>
+                <div style="margin-top:.5rem">
+                    <button type="submit" class="btn">📩 Envoyer le message</button>
+                </div>
+            </form>
+        </div>
+        <p sec:authorize="!isAuthenticated()" class="hint">
+            <a th:href="@{/login}">Connectez-vous</a> pour contacter le vendeur.
+        </p>
+        <p sec:authorize="isAuthenticated()" th:if="${canManage}" class="hint">
+            C'est votre annonce — retrouvez les messages reçus dans
+            <a th:href="@{/mes-messages}">Mes messages</a>.
+        </p>
+    </div>
+
+</main>
+</body>
+</html>

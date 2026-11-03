@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Mes messages')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main class="container-wide">
+
+    <div class="page-header" style="margin-top:1.5rem">
+        <h1 style="margin-bottom:0">📬 Mes messages</h1>
+        <form th:if="${!messages.isEmpty()}" th:action="@{/mes-messages/lu}" method="post">
+            <button type="submit" class="btn btn-secondary">✓ Tout marquer comme lu</button>
+        </form>
+    </div>
+
+    <p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+    <p th:if="${errorMessage}"   class="alert alert-error"   th:text="${errorMessage}"></p>
+
+    <!-- M4 : messages reçus -->
+    <h2 style="margin-top:1.75rem">📥 Messages reçus</h2>
+
+    <p th:if="${messages.isEmpty()}" class="hint" style="text-align:center;padding:1.5rem">
+        Aucun message reçu pour le moment.
+    </p>
+
+    <div class="card" th:if="${!messages.isEmpty()}" style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+            <thead>
+            <tr style="text-align:left;border-bottom:2px solid #e2e8f0">
+                <th style="padding:.6rem .5rem">De</th>
+                <th style="padding:.6rem .5rem">Annonce</th>
+                <th style="padding:.6rem .5rem">Message</th>
+                <th style="padding:.6rem .5rem">Reçu le</th>
+                <th style="padding:.6rem .5rem">État</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="message : ${messages}" style="border-bottom:1px solid #e2e8f0">
+                <td style="padding:.6rem .5rem">
+                    <strong th:text="${message.sender.name}">Nom</strong>
+                    <div class="hint" th:text="${message.sender.email}">email</div>
+                </td>
+                <td style="padding:.6rem .5rem">
+                    <a th:href="@{/annonces/{id}(id=${message.annonce.id})}"
+                       th:text="${message.annonce.title}">Titre de l'annonce</a>
+                </td>
+                <td style="padding:.6rem .5rem;white-space:pre-line" th:text="${message.content}">Message</td>
+                <td style="padding:.6rem .5rem"
+                    th:text="${#temporals.format(message.sentAt, 'dd/MM/yyyy HH:mm')}">Date</td>
+                <td style="padding:.6rem .5rem">
+                    <span class="badge badge-prix" th:if="${message.read}">Lu</span>
+                    <span class="badge badge-enchere" th:unless="${message.read}">🆕 Non lu</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- M4 : messages envoyés -->
+    <h2 style="margin-top:2rem">📤 Messages envoyés</h2>
+
+    <p th:if="${envoyes.isEmpty()}" class="hint" style="text-align:center;padding:1.5rem">
+        Vous n'avez envoyé aucun message. Utilisez « Contacter le vendeur » sur une annonce.
+    </p>
+
+    <div class="card" th:if="${!envoyes.isEmpty()}" style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+            <thead>
+            <tr style="text-align:left;border-bottom:2px solid #e2e8f0">
+                <th style="padding:.6rem .5rem">À</th>
+                <th style="padding:.6rem .5rem">Annonce</th>
+                <th style="padding:.6rem .5rem">Message</th>
+                <th style="padding:.6rem .5rem">Envoyé le</th>
+                <th style="padding:.6rem .5rem">État</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="message : ${envoyes}" style="border-bottom:1px solid #e2e8f0">
+                <td style="padding:.6rem .5rem">
+                    <strong th:text="${message.recipient.name}">Nom</strong>
+                    <div class="hint" th:text="${message.recipient.email}">email</div>
+                </td>
+                <td style="padding:.6rem .5rem">
+                    <a th:href="@{/annonces/{id}(id=${message.annonce.id})}"
+                       th:text="${message.annonce.title}">Titre de l'annonce</a>
+                </td>
+                <td style="padding:.6rem .5rem;white-space:pre-line" th:text="${message.content}">Message</td>
+                <td style="padding:.6rem .5rem"
+                    th:text="${#temporals.format(message.sentAt, 'dd/MM/yyyy HH:mm')}">Date</td>
+                <td style="padding:.6rem .5rem">
+                    <span class="badge badge-prix" th:if="${message.read}">Lu par le vendeur</span>
+                    <span class="badge badge-enchere" th:unless="${message.read}">Envoyé</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+</body>
+</html>

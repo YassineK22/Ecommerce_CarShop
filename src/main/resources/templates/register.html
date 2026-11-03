@@ -4,30 +4,32 @@
 <body>
 <header th:replace="~{fragments/layout :: header}"></header>
 <main class="container">
-    <div class="card">
-        <h1>Inscription</h1>
+    <div class="card" style="max-width:480px;margin:0 auto">
+        <h1 style="text-align:center;margin-bottom:1.5rem">✍️ Créer un compte</h1>
 
         <form th:action="@{/register}" th:object="${registrationForm}" method="post">
-            <label for="name">Nom</label>
-            <input id="name" th:field="*{name}" type="text" required/>
+            <label for="name">Nom complet *</label>
+            <input id="name" th:field="*{name}" type="text" required placeholder="Jean Dupont"/>
             <p class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
 
-            <label for="email">Email</label>
-            <input id="email" th:field="*{email}" type="email" required/>
+            <label for="email">Email *</label>
+            <input id="email" th:field="*{email}" type="email" required placeholder="jean@exemple.com"/>
             <p class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
 
-            <label for="password">Mot de passe</label>
-            <input id="password" th:field="*{password}" type="password" required/>
+            <label for="password">Mot de passe *</label>
+            <input id="password" th:field="*{password}" type="password" required placeholder="Au moins 8 caractères"/>
             <p class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
 
-            <label for="confirmPassword">Confirmer le mot de passe</label>
-            <input id="confirmPassword" th:field="*{confirmPassword}" type="password" required/>
+            <label for="confirmPassword">Confirmer le mot de passe *</label>
+            <input id="confirmPassword" th:field="*{confirmPassword}" type="password" required placeholder="••••••••"/>
             <p class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></p>
 
-            <button type="submit">Créer mon compte</button>
+            <button type="submit" style="width:100%;margin-top:.25rem">Créer mon compte</button>
         </form>
 
-        <p class="hint">Déjà inscrit ? <a th:href="@{/login}">Se connecter</a></p>
+        <p class="hint" style="text-align:center;margin-top:1rem">
+            Déjà inscrit ? <a th:href="@{/login}">Se connecter</a>
+        </p>
     </div>
 </main>
 </body>

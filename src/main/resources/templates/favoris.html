@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Mes favoris')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main class="container-wide">
+
+    <div class="page-header" style="margin-top:1.5rem">
+        <h1 style="margin-bottom:0">⭐ Mes favoris</h1>
+        <a class="btn btn-secondary" th:href="@{/annonces}">← Toutes les annonces</a>
+    </div>
+
+    <p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+    <p th:if="${errorMessage}"   class="alert alert-error"   th:text="${errorMessage}"></p>
+
+    <p th:if="${#lists.isEmpty(favoris)}" class="hint" style="text-align:center;padding:2rem">
+        Vous n'avez pas encore d'annonce en favori.
+    </p>
+
+    <div class="annonce-grid">
+        <article class="card annonce-card" th:each="favori : ${favoris}">
+            <a th:href="@{/annonces/{id}(id=${favori.annonce.id})}" class="annonce-card-link">
+                <img th:if="${!#lists.isEmpty(favori.annonce.photos)}"
+                     th:src="${favori.annonce.photos[0]}"
+                     alt="Photo du véhicule"
+                     class="annonce-thumb"/>
+                <div th:unless="${!#lists.isEmpty(favori.annonce.photos)}" class="annonce-thumb annonce-thumb-empty">
+                    📷 Pas de photo
+                </div>
+                <div class="annonce-card-body">
+                    <h3 th:text="${favori.annonce.title}">Titre</h3>
+                    <p class="annonce-meta">
+                        <span th:text="${favori.annonce.make + ' ' + favori.annonce.model}">Marque modèle</span> ·
+                        <span th:text="${favori.annonce.year}">2020</span> ·
+                        <span th:text="${#numbers.formatInteger(favori.annonce.mileage, 0, 'POINT')} + ' km'">0 km</span>
+                    </p>
+                    <p class="annonce-price"
+                       th:text="${#numbers.formatDecimal(favori.annonce.price, 1, 'POINT', 2, 'COMMA')} + ' DT'">0 DT</p>
+                </div>
+            </a>
+            <form th:action="@{/annonces/{id}/favori(id=${favori.annonce.id})}" method="post">
+                <input type="hidden" name="retour" value="favoris"/>
+                <button type="submit" class="btn btn-danger">✕ Retirer des favoris</button>
+            </form>
+        </article>
+    </div>
+
+</main>
+</body>
+</html>

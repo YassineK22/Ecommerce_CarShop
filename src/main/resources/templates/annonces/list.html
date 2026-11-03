@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Annonces')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main class="container-wide">
+
+    <div class="page-header" style="margin-top:1.5rem">
+        <h1 style="margin-bottom:0">Annonces</h1>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <a sec:authorize="isAuthenticated()" class="btn" th:href="@{/annonces/new}">+ Publier une annonce</a>
+            <a sec:authorize="isAnonymous()" class="btn btn-secondary" th:href="@{/login}">Connectez-vous pour publier</a>
+        </div>
+    </div>
+
+    <p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+    <p th:if="${errorMessage}"   class="alert alert-error"   th:text="${errorMessage}"></p>
+
+    <!-- Filtres -->
+    <div class="card">
+        <h2 style="margin-bottom:.75rem">🔍 Rechercher et filtrer</h2>
+        <form th:action="@{/annonces}" method="get" class="filter-form">
+            <div class="filter-grid">
+                <div>
+                    <label for="make">Marque</label>
+                    <input id="make" name="make" type="text" th:value="${criteria.make}" placeholder="ex. Renault"/>
+                </div>
+                <div>
+                    <label for="minPrice">Prix min (DT)</label>
+                    <input id="minPrice" name="minPrice" type="number" step="0.01" min="0" th:value="${criteria.minPrice}"/>
+                </div>
+                <div>
+                    <label for="maxPrice">Prix max (DT)</label>
+                    <input id="maxPrice" name="maxPrice" type="number" step="0.01" min="0" th:value="${criteria.maxPrice}"/>
+                </div>
+                <div>
+                    <label for="minYear">Année min</label>
+                    <input id="minYear" name="minYear" type="number" min="1900" max="2100" th:value="${criteria.minYear}"/>
+                </div>
+                <div>
+                    <label for="maxYear">Année max</label>
+                    <input id="maxYear" name="maxYear" type="number" min="1900" max="2100" th:value="${criteria.maxYear}"/>
+                </div>
+                <div>
+                    <label for="maxMileage">Kilométrage max (km)</label>
+                    <input id="maxMileage" name="maxMileage" type="number" min="0" th:value="${criteria.maxMileage}"/>
+                </div>
+            </div>
+            <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+                <button type="submit">Appliquer les filtres</button>
+                <a class="btn btn-secondary" th:href="@{/annonces}">Réinitialiser</a>
+            </div>
+        </form>
+    </div>
+
+    <p th:if="${#lists.isEmpty(annonces)}" class="hint" style="text-align:center;padding:2rem">
+        Aucune annonce ne correspond à votre recherche.
+    </p>
+
+    <div class="annonce-grid">
+        <form th:action="@{/comparer}" method="get" style="display:contents">
+        <article class="card annonce-card" th:each="annonce : ${annonces}">
+            <a th:href="@{/annonces/{id}(id=${annonce.id})}" class="annonce-card-link">
+                <img th:if="${!#lists.isEmpty(annonce.photos)}"
+                     th:src="${annonce.photos[0]}"
+                     alt="Photo du véhicule"
+                     class="annonce-thumb"/>
+                <div th:unless="${!#lists.isEmpty(annonce.photos)}" class="annonce-thumb annonce-thumb-empty">
+                    📷 Pas de photo
+                </div>
+                <div class="annonce-card-body">
+                    <h3 th:text="${annonce.title}">Titre</h3>
+                    <p class="annonce-meta">
+                        <span th:text="${annonce.make + ' ' + annonce.model}">Marque modèle</span> ·
+                        <span th:text="${annonce.year}">2020</span> ·
+                        <span th:text="${#numbers.formatInteger(annonce.mileage, 0, 'POINT')} + ' km'">0 km</span>
+                    </p>
+                    <p class="annonce-price" th:text="${#numbers.formatDecimal(annonce.price, 1, 'POINT', 2, 'COMMA')} + ' DT'">0 DT</p>
+                    <span class="badge"
+                          th:classappend="${annonce.type.name() == 'ENCHERE'} ? 'badge-enchere' : 'badge-prix'"
+                          th:text="${annonce.type.name() == 'ENCHERE'} ? '🔨 Enchère' : '🏷️ Prix fixe'">type</span>
+                </div>
+            </a>
+            <label class="hint" style="display:flex;gap:.4rem;align-items:center;padding:.4rem .75rem">
+                <input type="checkbox" name="ids" th:value="${annonce.id}"/> Comparer
+            </label>
+        </article>
+        </form>
+    </div>
+
+    <div style="margin-top:1rem;text-align:center" th:if="${!#lists.isEmpty(annonces)}">
+        <button type="button" class="btn btn-secondary"
+                onclick="document.querySelector('form[action*=comparer]').requestSubmit()">
+            ⚖️ Comparer la sélection (2 ou 3)
+        </button>
+    </div>
+
+    <!-- Pagination : 9 annonces par page -->
+    <div th:if="${page.totalPages > 1}"
+         style="margin-top:1rem;margin-bottom:2rem;display:flex;gap:.6rem;justify-content:center;align-items:center">
+        <a class="btn btn-secondary" th:if="${page.hasPrevious}"
+           th:href="@{/annonces(page=${page.number - 1}, make=${criteria.make}, minPrice=${criteria.minPrice}, maxPrice=${criteria.maxPrice}, minYear=${criteria.minYear}, maxYear=${criteria.maxYear}, maxMileage=${criteria.maxMileage})}">← Précédent</a>
+        <span class="hint">Page <span th:text="${page.number + 1}"></span> / <span th:text="${page.totalPages}"></span></span>
+        <a class="btn btn-secondary" th:if="${page.hasNext}"
+           th:href="@{/annonces(page=${page.number + 1}, make=${criteria.make}, minPrice=${criteria.minPrice}, maxPrice=${criteria.maxPrice}, minYear=${criteria.minYear}, maxYear=${criteria.maxYear}, maxMileage=${criteria.maxMileage})}">Suivant →</a>
+    </div>
+
+</main>
+</body>
+</html>
