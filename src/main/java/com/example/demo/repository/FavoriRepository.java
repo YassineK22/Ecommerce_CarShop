@@ -13,5 +13,15 @@ public interface FavoriRepository extends JpaRepository<Favori, Long> {
 
 	boolean existsByUserIdAndAnnonceId(Long userId, Long annonceId);
 
+	/**
+	 * Tableau de bord : nombre de favoris d'un utilisateur.
+	 */
+	long countByUserId(Long userId);
+
+	/**
+	 * Tableau de bord : les 5 derniers favoris d'un utilisateur.
+	 */
+	List<Favori> findTop5ByUserIdOrderByCreatedAtDesc(Long userId);
+
 	void deleteByAnnonceId(Long annonceId);
 }

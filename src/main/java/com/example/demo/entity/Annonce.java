@@ -22,6 +22,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "annonces")
@@ -72,6 +73,11 @@ public class Annonce {
 
 	@Column(nullable = false)
 	private boolean active = true;
+
+	// M5 : annonce signalée par un utilisateur, elle remonte en tête de la liste d'administration
+	@Column(nullable = false)
+	@ColumnDefault("false")
+	private boolean signalee = false;
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "annonce_photos", joinColumns = @JoinColumn(name = "annonce_id"))

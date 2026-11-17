@@ -5,6 +5,7 @@ import com.example.demo.dto.RegistrationForm;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -55,5 +56,38 @@ public class UserService {
 
 	public boolean matchesPassword(User user, String rawPassword) {
 		return passwordEncoder.matches(rawPassword, user.getPassword());
+	}
+
+	/**
+	 * M5 : liste des comptes pour la page d'administration.
+	 */
+	public List<User> findAll() {
+		return userRepository.findAllByOrderByIdAsc();
+	}
+
+	/**
+	 * M5 : nombre d'utilisateurs (tableau de bord).
+	 */
+	public long count() {
+		return userRepository.count();
+	}
+
+	/**
+	 * M5 : active ou désactive un compte.
+	 * Règle : un administrateur ne peut pas désactiver son propre compte.
+	 * Le champ User.active est déjà relié à UserDetails.isEnabled(),
+	 * donc Spring Security refuse automatiquement la connexion d'un compte désactivé.
+	 */
+	@Transactional
+	public User setActive(Long id, boolean active, User admin) {
+		User target = userRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("Utilisateur introuvable"));
+
+		if (!active && target.getId().equals(admin.getId())) {
+			throw new IllegalArgumentException("Vous ne pouvez pas désactiver votre propre compte");
+		}
+
+		target.setActive(active);
+		return userRepository.save(target);
 	}
 }

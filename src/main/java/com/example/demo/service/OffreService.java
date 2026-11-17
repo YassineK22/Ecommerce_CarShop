@@ -38,6 +38,13 @@ public class OffreService {
 	}
 
 	/**
+	 * M5 : nombre total d'offres placées (tableau de bord).
+	 */
+	public long count() {
+		return offreRepository.count();
+	}
+
+	/**
 	 * Place une offre sur une enchère ouverte.
 	 * Règles : annonce de type enchère, enchère encore ouverte,
 	 * pas d'auto-enchère du vendeur, montant supérieur à la meilleure offre.

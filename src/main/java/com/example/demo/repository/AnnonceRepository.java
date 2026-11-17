@@ -19,6 +19,31 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long>, JpaSpec
 			TypeAnnonce type, StatutEnchere statutEnchere, LocalDateTime date);
 
 	/**
+	 * M5 : liste d'administration, les annonces signalées remontent en premier.
+	 */
+	List<Annonce> findAllByOrderBySignaleeDescCreatedAtDesc();
+
+	/**
+	 * M5 : nombre d'annonces signalées (tableau de bord).
+	 */
+	long countBySignaleeTrue();
+
+	/**
+	 * Tableau de bord : nombre d'annonces actives d'un vendeur.
+	 */
+	long countBySellerIdAndActiveTrue(Long sellerId);
+
+	/**
+	 * Tableau de bord : les 5 dernières annonces d'un vendeur.
+	 */
+	List<Annonce> findTop5BySellerIdOrderByCreatedAtDesc(Long sellerId);
+
+	/**
+	 * M5 : nombre d'enchères encore ouvertes (tableau de bord).
+	 */
+	long countByTypeAndStatutEnchere(TypeAnnonce type, StatutEnchere statutEnchere);
+
+	/**
 	 * Charge l'annonce en verrouillant sa ligne : deux offres simultanées
 	 * passent alors l'une après l'autre (la deuxième voit la première).
 	 */

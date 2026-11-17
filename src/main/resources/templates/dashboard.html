@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Tableau de bord')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main class="container-wide">
+
+    <div class="page-header" style="margin-top:1.5rem">
+        <div>
+            <h1 style="margin-bottom:.2rem">📊 Tableau de bord</h1>
+            <p class="hint" style="margin:0">
+                Bonjour <strong sec:authentication="name"></strong> — voici l'activité de votre compte.
+            </p>
+        </div>
+        <a class="btn" th:href="@{/annonces/new}">+ Publier une annonce</a>
+    </div>
+
+    <p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+    <p th:if="${errorMessage}"   class="alert alert-error"   th:text="${errorMessage}"></p>
+
+    <!-- Compteurs personnels -->
+    <div class="stats-strip">
+        <div class="stat-card">
+            <div class="stat-num" th:text="${dashboard.mesAnnoncesActives}">0</div>
+            <div class="stat-label">Mes annonces actives</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" th:text="${dashboard.mesOffres}">0</div>
+            <div class="stat-label">Mes offres</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" th:text="${dashboard.encheresGagnees}">0</div>
+            <div class="stat-label">Enchères gagnées</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" th:text="${dashboard.mesFavoris}">0</div>
+            <div class="stat-label">Favoris</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" th:text="${dashboard.messagesNonLus}">0</div>
+            <div class="stat-label">Messages non lus</div>
+        </div>
+    </div>
+
+    <!-- Listes courtes -->
+    <div class="profile-grid" style="margin-top:1.5rem">
+
+        <!-- Mes dernières annonces -->
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-bottom:.5rem">
+                <h2 style="margin:0">🚗 Mes dernières annonces</h2>
+                <a th:href="@{/annonces}">Toutes les annonces</a>
+            </div>
+
+            <p th:if="${#lists.isEmpty(dashboard.dernieresAnnonces)}" class="hint" style="padding:.8rem 0">
+                Vous n'avez publié aucune annonce pour le moment.
+            </p>
+
+            <div th:each="annonce : ${dashboard.dernieresAnnonces}"
+                 style="padding:.6rem 0;border-bottom:1px solid #e2e8f0">
+                <div style="display:flex;justify-content:space-between;gap:.75rem;align-items:baseline">
+                    <a th:href="@{/annonces/{id}(id=${annonce.id})}" th:text="${annonce.title}">Titre</a>
+                    <span class="badge"
+                          th:classappend="${annonce.type.name() == 'ENCHERE'} ? 'badge-enchere' : 'badge-prix'"
+                          th:text="${annonce.type.name() == 'ENCHERE'} ? 'Enchère' : 'Prix fixe'">Type</span>
+                </div>
+                <div class="hint">
+                    <span th:text="${#numbers.formatDecimal(annonce.price, 1, 'POINT', 2, 'COMMA')} + ' DT'">0 DT</span> ·
+                    <span th:text="${annonce.year}">2020</span> ·
+                    <span th:text="${#numbers.formatInteger(annonce.mileage, 0, 'POINT')} + ' km'">0 km</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mes dernières offres -->
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-bottom:.5rem">
+                <h2 style="margin:0">🔨 Mes dernières offres</h2>
+                <a th:href="@{/annonces}">Voir les annonces</a>
+            </div>
+
+            <p th:if="${#lists.isEmpty(dashboard.dernieresOffres)}" class="hint" style="padding:.8rem 0">
+                Vous n'avez placé aucune offre pour le moment.
+            </p>
+
+            <div th:each="offre : ${dashboard.dernieresOffres}"
+                 style="padding:.6rem 0;border-bottom:1px solid #e2e8f0">
+                <a th:href="@{/annonces/{id}(id=${offre.annonce.id})}" th:text="${offre.annonce.title}">Annonce</a>
+                <div class="hint">
+                    <strong th:text="${#numbers.formatDecimal(offre.amount, 1, 'POINT', 2, 'COMMA')} + ' DT'">0 DT</strong> ·
+                    <span th:text="${#temporals.format(offre.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2026</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Derniers messages -->
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-bottom:.5rem">
+                <h2 style="margin:0">✉️ Derniers messages</h2>
+                <a th:href="@{/mes-messages}">Tous les messages</a>
+            </div>
+
+            <p th:if="${#lists.isEmpty(dashboard.derniersMessages)}" class="hint" style="padding:.8rem 0">
+                Aucun message reçu pour le moment.
+            </p>
+
+            <div th:each="message : ${dashboard.derniersMessages}"
+                 style="padding:.6rem 0;border-bottom:1px solid #e2e8f0">
+                <div style="display:flex;justify-content:space-between;gap:.75rem;align-items:baseline">
+                    <strong th:text="${message.sender.name}">Expéditeur</strong>
+                    <span class="badge badge-enchere" th:if="${!message.read}">Non lu</span>
+                </div>
+                <div class="hint">
+                    <span th:text="${#strings.abbreviate(message.content, 70)}">Contenu</span>
+                </div>
+                <div class="hint">
+                    <a th:href="@{/annonces/{id}(id=${message.annonce.id})}"
+                       th:text="${message.annonce.title}">Annonce</a> ·
+                    <span th:text="${#temporals.format(message.sentAt, 'dd/MM/yyyy HH:mm')}">01/01/2026</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Derniers favoris -->
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-bottom:.5rem">
+                <h2 style="margin:0">⭐ Derniers favoris</h2>
+                <a th:href="@{/mes-favoris}">Tous mes favoris</a>
+            </div>
+
+            <p th:if="${#lists.isEmpty(dashboard.derniersFavoris)}" class="hint" style="padding:.8rem 0">
+                Vous n'avez pas encore d'annonce en favori.
+            </p>
+
+            <div th:each="favori : ${dashboard.derniersFavoris}"
+                 style="padding:.6rem 0;border-bottom:1px solid #e2e8f0">
+                <a th:href="@{/annonces/{id}(id=${favori.annonce.id})}" th:text="${favori.annonce.title}">Annonce</a>
+                <div class="hint">
+                    <span th:text="${#numbers.formatDecimal(favori.annonce.price, 1, 'POINT', 2, 'COMMA')} + ' DT'">0 DT</span> ·
+                    ajouté le <span th:text="${#temporals.format(favori.createdAt, 'dd/MM/yyyy')}">01/01/2026</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="card" style="margin-top:1.5rem">
+        <h2 style="margin-top:0">Actions rapides</h2>
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+            <a class="btn" th:href="@{/annonces/new}">+ Publier une annonce</a>
+            <a class="btn btn-secondary" th:href="@{/mes-favoris}">⭐ Mes favoris</a>
+            <a class="btn btn-secondary" th:href="@{/mes-messages}">✉️ Mes messages</a>
+            <a class="btn btn-secondary" th:href="@{/annonces}">🔍 Rechercher</a>
+        </div>
+    </div>
+
+    <!-- Bloc administrateur -->
+    <div th:if="${dashboard.adminStats != null}" class="card"
+         style="margin-top:1.5rem;border-left:4px solid #4f46e5">
+        <h2 style="margin-top:0">🛠️ Administration</h2>
+
+        <div class="stats-strip" style="justify-content:flex-start;margin-top:.5rem">
+            <div class="stat-card">
+                <div class="stat-num" th:text="${dashboard.adminStats.utilisateurs}">0</div>
+                <div class="stat-label">Utilisateurs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" th:text="${dashboard.adminStats.annonces}">0</div>
+                <div class="stat-label">Annonces</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" th:text="${dashboard.adminStats.encheresOuvertes}">0</div>
+                <div class="stat-label">Enchères ouvertes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" th:text="${dashboard.adminStats.offres}">0</div>
+                <div class="stat-label">Offres placées</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" th:text="${dashboard.adminStats.annoncesSignalees}">0</div>
+                <div class="stat-label">Annonces signalées</div>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem">
+            <a class="btn" th:href="@{/admin}">Tableau de bord admin</a>
+            <a class="btn btn-secondary" th:href="@{/admin/annonces}">📋 Modérer les annonces</a>
+            <a class="btn btn-secondary" th:href="@{/admin/utilisateurs}">👥 Gérer les comptes</a>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

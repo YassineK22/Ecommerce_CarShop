@@ -33,6 +33,16 @@
                     </form>
                 </div>
 
+                <!-- M5 : signaler l'annonce -->
+                <div sec:authorize="isAuthenticated()" th:if="${!isOwner and !annonce.signalee}" style="margin-top:.8rem">
+                    <form th:action="@{/annonces/{id}/signaler(id=${annonce.id})}" method="post" style="display:inline">
+                        <button type="submit" class="btn btn-secondary">🚩 Signaler cette annonce</button>
+                    </form>
+                </div>
+                <p th:if="${annonce.signalee}" class="hint" style="margin-top:.6rem">
+                    🚩 Cette annonce a été signalée : elle est en attente de modération.
+                </p>
+
                 <p th:if="${annonce.type.name() == 'ENCHERE' and annonce.auctionEndDate != null}"
                    class="hint" style="margin-top:.6rem">
                     ⏰ Fin de l'enchère :

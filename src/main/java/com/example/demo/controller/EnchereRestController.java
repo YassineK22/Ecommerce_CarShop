@@ -4,6 +4,8 @@ import com.example.demo.entity.Annonce;
 import com.example.demo.entity.Offre;
 import com.example.demo.service.AnnonceService;
 import com.example.demo.service.OffreService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/annonces")
+@Tag(name = "Enchères", description = "Consultation de la meilleure offre d'une annonce aux enchères")
 public class EnchereRestController {
 
 	@Autowired
@@ -36,6 +39,10 @@ public class EnchereRestController {
 	}
 
 	@GetMapping("/{id}/meilleure-offre")
+	@Operation(
+			summary = "Meilleure offre d'une annonce",
+			description = "Renvoie le montant de la meilleure offre, l'enchérisseur, la date, "
+					+ "la fin de l'enchère et son statut. Sans offre, le prix de départ est renvoyé.")
 	public MeilleureOffreView meilleureOffre(@PathVariable Long id) {
 		Annonce annonce = annonceService.findById(id);
 		List<Offre> offres = offreService.getOffres(id);

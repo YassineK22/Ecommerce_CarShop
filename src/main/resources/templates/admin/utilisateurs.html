@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Gestion des comptes')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main class="container-wide">
+
+    <div class="page-header" style="margin-top:1.5rem">
+        <h1 style="margin-bottom:0">👥 Gestion des comptes</h1>
+    </div>
+
+    <p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+    <p th:if="${errorMessage}"   class="alert alert-error"   th:text="${errorMessage}"></p>
+
+    <p class="hint" style="margin-bottom:1rem">
+        Un compte désactivé ne peut plus se connecter.
+    </p>
+
+    <div class="card" style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+            <thead>
+            <tr style="text-align:left;border-bottom:2px solid #e2e8f0">
+                <th style="padding:.6rem .5rem">Nom</th>
+                <th style="padding:.6rem .5rem">Email</th>
+                <th style="padding:.6rem .5rem">Rôle</th>
+                <th style="padding:.6rem .5rem">État</th>
+                <th style="padding:.6rem .5rem">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}" style="border-bottom:1px solid #e2e8f0">
+                <td style="padding:.6rem .5rem" th:text="${user.name}">Nom</td>
+                <td style="padding:.6rem .5rem" th:text="${user.email}">Email</td>
+                <td style="padding:.6rem .5rem">
+                    <span class="badge" th:classappend="${user.role.name() == 'ADMIN'} ? 'badge-enchere' : 'badge-prix'"
+                          th:text="${user.role.name() == 'ADMIN'} ? 'Administrateur' : 'Utilisateur'">Rôle</span>
+                </td>
+                <td style="padding:.6rem .5rem">
+                    <span class="badge badge-prix" th:if="${user.active}">✅ Actif</span>
+                    <span class="badge badge-enchere" th:unless="${user.active}">⛔ Désactivé</span>
+                </td>
+                <td style="padding:.6rem .5rem">
+                    <form th:if="${user.active}" th:action="@{/admin/utilisateurs/{id}/desactiver(id=${user.id})}" method="post">
+                        <button type="submit" class="btn btn-danger"
+                                onclick="return confirm('Désactiver ce compte ?')">⛔ Désactiver</button>
+                    </form>
+                    <form th:unless="${user.active}" th:action="@{/admin/utilisateurs/{id}/activer(id=${user.id})}" method="post">
+                        <button type="submit" class="btn btn-secondary">✅ Activer</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+</body>
+</html>

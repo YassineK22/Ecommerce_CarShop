@@ -93,6 +93,8 @@ public class AnnonceController {
 		Annonce annonce = annonceService.findById(id);
 		model.addAttribute("annonce", annonce);
 		model.addAttribute("canManage", currentUser != null && annonceService.canManage(annonce, currentUser));
+		// M5 : on ne propose le bouton "Signaler" qu'aux visiteurs qui ne sont pas le vendeur
+		model.addAttribute("isOwner", currentUser != null && annonceService.isOwner(annonce, currentUser));
 
 		// M3 : offres de l'enchère
 		model.addAttribute("offres", offreService.getOffres(id));
@@ -174,6 +176,23 @@ public class AnnonceController {
 			return "redirect:/annonces/" + id;
 		}
 		return "redirect:/annonces";
+	}
+
+	/**
+	 * M5 : un utilisateur signale une annonce abusive (il ne peut pas signaler la sienne).
+	 */
+	@PostMapping("/{id}/signaler")
+	public String signaler(
+			@PathVariable Long id,
+			@AuthenticationPrincipal User user,
+			RedirectAttributes redirectAttributes) {
+		try {
+			annonceService.signaler(id, user);
+			redirectAttributes.addFlashAttribute("successMessage", "Annonce signalée, merci.");
+		} catch (IllegalArgumentException ex) {
+			redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+		}
+		return "redirect:/annonces/" + id;
 	}
 
 	private void validateAuction(AnnonceForm form, BindingResult bindingResult) {

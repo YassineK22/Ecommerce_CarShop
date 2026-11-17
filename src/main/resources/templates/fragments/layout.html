@@ -19,6 +19,7 @@
             <a sec:authorize="isAuthenticated()" th:href="@{/mes-favoris}">Mes favoris</a>
             <a sec:authorize="isAuthenticated()" th:href="@{/mes-messages}">Mes messages</a>
             <a sec:authorize="isAuthenticated()" th:href="@{/profile}">Mon profil</a>
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">🛠️ Admin</a>
             <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="logout-form">
                 <button type="submit">Déconnexion</button>
             </form>

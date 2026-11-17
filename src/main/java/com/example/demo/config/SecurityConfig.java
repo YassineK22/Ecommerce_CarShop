@@ -23,6 +23,7 @@ public class SecurityConfig {
 		http
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/", "/register", "/login", "/css/**", "/uploads/**", "/error").permitAll()
+						.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**").permitAll()
 						.requestMatchers(HttpMethod.GET, "/annonces", "/annonces/*").permitAll()
 						.requestMatchers(HttpMethod.GET, "/comparer").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/annonces/*/meilleure-offre").permitAll()

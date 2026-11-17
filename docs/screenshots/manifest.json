@@ -1,0 +1,130 @@
+{
+  "base": "http://localhost:8080",
+  "viewport": {
+    "width": 1366,
+    "height": 768
+  },
+  "captures": [
+    {
+      "file": "01-accueil.png",
+      "url": "/",
+      "label": "Accueil public",
+      "account": "Visiteur (non connecte)"
+    },
+    {
+      "file": "02-annonces.png",
+      "url": "/annonces",
+      "label": "Liste des annonces avec recherche et filtres",
+      "account": "Visiteur (non connecte)"
+    },
+    {
+      "file": "03-annonces-filtres.png",
+      "url": "/annonces?make=Renault&maxPrice=80000",
+      "label": "Liste filtree (Renault, 80 000 DT max)",
+      "account": "Visiteur (non connecte)"
+    },
+    {
+      "file": "04-annonces-page-2.png",
+      "url": "/annonces?page=1",
+      "label": "Liste des annonces, page 2 (pagination)",
+      "account": "Visiteur (non connecte)"
+    },
+    {
+      "file": "05-detail-prix-fixe.png",
+      "url": "/annonces/5",
+      "label": "Detail annonce a prix fixe (Renault Clio 5 Neuve)",
+      "account": "Visiteur (non connecte)"
+    },
+    {
+      "file": "06-detail-enchere.png",
+      "url": "/annonces/2",
+      "label": "Detail enchere cloturee avec l'historique des offres",
+      "account": "Visiteur (non connecte)"
+    },
+    {
+      "file": "07-detail-enchere-ouverte.png",
+      "url": "/annonces/6",
+      "label": "Detail enchere ouverte avec le formulaire d'offre",
+      "account": "Ahmed Encherisseur"
+    },
+    {
+      "file": "08-login.png",
+      "url": "/login",
+      "label": "Connexion",
+      "account": "Visiteur (non connecte)"
+    },
+    {
+      "file": "09-register.png",
+      "url": "/register",
+      "label": "Inscription",
+      "account": "Visiteur (non connecte)"
+    },
+    {
+      "file": "10-dashboard.png",
+      "url": "/",
+      "label": "Tableau de bord personnel",
+      "account": "Ahmed Encherisseur"
+    },
+    {
+      "file": "11-annonce-new.png",
+      "url": "/annonces/new",
+      "label": "Publier une annonce (formulaire)",
+      "account": "Ahmed Encherisseur"
+    },
+    {
+      "file": "12-annonce-edit.png",
+      "url": "/annonces/6/edit",
+      "label": "Modifier une annonce (formulaire)",
+      "account": "Hamza Vendeur"
+    },
+    {
+      "file": "13-mes-favoris.png",
+      "url": "/mes-favoris",
+      "label": "Mes favoris",
+      "account": "Ahmed Encherisseur"
+    },
+    {
+      "file": "14-mes-messages.png",
+      "url": "/mes-messages",
+      "label": "Mes messages (boite de reception)",
+      "account": "AutoPlus Tunisie"
+    },
+    {
+      "file": "15-profil.png",
+      "url": "/profile",
+      "label": "Mon profil",
+      "account": "Ahmed Encherisseur"
+    },
+    {
+      "file": "16-comparer.png",
+      "url": "/comparer?ids=5,7,9",
+      "label": "Comparaison de 3 annonces",
+      "account": "Ahmed Encherisseur"
+    },
+    {
+      "file": "17-admin-dashboard.png",
+      "url": "/admin",
+      "label": "Administration : tableau de bord",
+      "account": "Administrateur"
+    },
+    {
+      "file": "18-admin-annonces.png",
+      "url": "/admin/annonces",
+      "label": "Administration : annonces (signalees en premier)",
+      "account": "Administrateur"
+    },
+    {
+      "file": "19-admin-utilisateurs.png",
+      "url": "/admin/utilisateurs",
+      "label": "Administration : utilisateurs",
+      "account": "Administrateur"
+    },
+    {
+      "file": "20-swagger.png",
+      "url": "/swagger-ui.html",
+      "label": "Swagger UI (/swagger-ui.html)",
+      "account": "Visiteur (non connecte)"
+    }
+  ],
+  "skipped": []
+}

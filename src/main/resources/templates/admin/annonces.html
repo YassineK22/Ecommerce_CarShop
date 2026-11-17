@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Modération des annonces')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main class="container-wide">
+
+    <div class="page-header" style="margin-top:1.5rem">
+        <h1 style="margin-bottom:0">📋 Modération des annonces</h1>
+    </div>
+
+    <p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+    <p th:if="${errorMessage}"   class="alert alert-error"   th:text="${errorMessage}"></p>
+
+    <p class="hint" style="margin-bottom:1rem">
+        Les annonces signalées par les utilisateurs sont affichées en premier.
+    </p>
+
+    <div class="card" style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+            <thead>
+            <tr style="text-align:left;border-bottom:2px solid #e2e8f0">
+                <th style="padding:.6rem .5rem">Annonce</th>
+                <th style="padding:.6rem .5rem">Vendeur</th>
+                <th style="padding:.6rem .5rem">Type</th>
+                <th style="padding:.6rem .5rem">Prix</th>
+                <th style="padding:.6rem .5rem">Publiée le</th>
+                <th style="padding:.6rem .5rem">État</th>
+                <th style="padding:.6rem .5rem">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="annonce : ${annonces}" style="border-bottom:1px solid #e2e8f0">
+                <td style="padding:.6rem .5rem">
+                    <a th:href="@{/annonces/{id}(id=${annonce.id})}" th:text="${annonce.title}">Titre</a>
+                    <div class="hint">
+                        <span th:text="${annonce.make + ' ' + annonce.model}">Marque modele</span> ·
+                        <span th:text="${annonce.year}">2020</span> ·
+                        <span th:text="${#numbers.formatInteger(annonce.mileage, 0, 'POINT')} + ' km'">0 km</span>
+                    </div>
+                </td>
+                <td style="padding:.6rem .5rem" th:text="${annonce.seller.name}">Vendeur</td>
+                <td style="padding:.6rem .5rem">
+                    <span class="badge"
+                          th:classappend="${annonce.type.name() == 'ENCHERE'} ? 'badge-enchere' : 'badge-prix'"
+                          th:text="${annonce.type.name() == 'ENCHERE'} ? '🔨 Enchère' : '🏷️ Prix fixe'">Type</span>
+                </td>
+                <td style="padding:.6rem .5rem"
+                    th:text="${#numbers.formatDecimal(annonce.price, 1, 'POINT', 2, 'COMMA')} + ' DT'">Prix</td>
+                <td style="padding:.6rem .5rem"
+                    th:text="${#temporals.format(annonce.createdAt, 'dd/MM/yyyy')}">Date</td>
+                <td style="padding:.6rem .5rem">
+                    <span class="badge badge-enchere" th:if="${annonce.signalee}">🚩 Signalée</span>
+                    <span class="badge badge-prix" th:unless="${annonce.signalee}">Active</span>
+                </td>
+                <td style="padding:.6rem .5rem">
+                    <form th:action="@{/admin/annonces/{id}/delete(id=${annonce.id})}" method="post">
+                        <button type="submit" class="btn btn-danger"
+                                onclick="return confirm('Supprimer définitivement cette annonce ?')">🗑️ Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+</body>
+</html>

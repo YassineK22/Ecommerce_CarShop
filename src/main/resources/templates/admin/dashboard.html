@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Administration')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main class="container">
+
+    <div class="page-header" style="margin-top:1.5rem">
+        <h1 style="margin-bottom:0">🛠️ Administration</h1>
+    </div>
+
+    <p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+    <p th:if="${errorMessage}"   class="alert alert-error"   th:text="${errorMessage}"></p>
+
+    <!-- Tableau de bord -->
+    <div class="stats-strip">
+        <div class="stat-card">
+            <div class="stat-num" th:text="${nbUsers}">0</div>
+            <div class="stat-label">Utilisateurs</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" th:text="${nbAnnonces}">0</div>
+            <div class="stat-label">Annonces</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" th:text="${nbEncheresOuvertes}">0</div>
+            <div class="stat-label">Enchères ouvertes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" th:text="${nbOffres}">0</div>
+            <div class="stat-label">Offres placées</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" th:text="${nbSignalees}">0</div>
+            <div class="stat-label">Annonces signalées</div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:1.5rem">
+        <h2>Actions</h2>
+        <p class="hint" style="margin-bottom:1rem">
+            Modération des annonces et gestion des comptes utilisateurs.
+        </p>
+        <a class="btn" th:href="@{/admin/annonces}">📋 Modérer les annonces</a>
+        <a class="btn btn-secondary" th:href="@{/admin/utilisateurs}">👥 Gérer les comptes</a>
+    </div>
+
+</main>
+</body>
+</html>

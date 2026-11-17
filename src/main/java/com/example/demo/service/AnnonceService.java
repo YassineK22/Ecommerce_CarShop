@@ -117,6 +117,66 @@ public class AnnonceService {
 		// Les favoris ne sont que des signets : ils partent avec l'annonce
 		favoriRepository.deleteByAnnonceId(id);
 
+		deleteAnnonceAndPhotos(annonce);
+	}
+
+	/**
+	 * M5 : liste d'administration, les annonces signalées en premier.
+	 */
+	public List<Annonce> findAllForAdmin() {
+		return annonceRepository.findAllByOrderBySignaleeDescCreatedAtDesc();
+	}
+
+	/**
+	 * M5 : un utilisateur signale une annonce (annonce d'un autre vendeur).
+	 */
+	@Transactional
+	public Annonce signaler(Long id, User reporter) {
+		Annonce annonce = findById(id);
+		if (isOwner(annonce, reporter)) {
+			throw new IllegalArgumentException("Vous ne pouvez pas signaler votre propre annonce");
+		}
+		annonce.setSignalee(true);
+		return annonceRepository.save(annonce);
+	}
+
+	/**
+	 * M5 : suppression d'une annonce par l'administrateur.
+	 * Contrairement au vendeur, l'admin peut tout supprimer : on efface d'abord
+	 * les données liées (offres, messages, favoris) pour éviter une erreur de clé étrangère.
+	 */
+	@Transactional
+	public void deleteByAdmin(Long id) throws IOException {
+		Annonce annonce = annonceRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("Annonce introuvable"));
+
+		offreRepository.deleteByAnnonceId(id);
+		messageRepository.deleteByAnnonceId(id);
+		favoriRepository.deleteByAnnonceId(id);
+
+		deleteAnnonceAndPhotos(annonce);
+	}
+
+	/**
+	 * M5 : compteurs du tableau de bord.
+	 */
+	public long count() {
+		return annonceRepository.count();
+	}
+
+	public long countSignalees() {
+		return annonceRepository.countBySignaleeTrue();
+	}
+
+	public long countEncheresOuvertes() {
+		return annonceRepository.countByTypeAndStatutEnchere(TypeAnnonce.ENCHERE, StatutEnchere.OUVERTE);
+	}
+
+	/**
+	 * Suppression de l'annonce puis de ses fichiers photo (appelé seulement après le flush,
+	 * pour ne pas perdre les images si la suppression en base échoue).
+	 */
+	private void deleteAnnonceAndPhotos(Annonce annonce) throws IOException {
 		annonceRepository.delete(annonce);
 		annonceRepository.flush();
 
