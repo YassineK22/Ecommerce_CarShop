@@ -1,13 +1,13 @@
 # AutoHub
 
 Marketplace de voitures d'occasion : publication d'annonces, **enchères**, favoris, messagerie
-entre utilisateurs et **administration**. Application **monolithique** Spring Boot (Java 17) dont les
+entre utilisateurs et **administration**. Application **monolithique** Spring Boot (Java 25) dont les
 pages sont rendues côté serveur par **Thymeleaf**, avec une base **PostgreSQL**.
 
 | Élément | Version / choix |
 |---|---|
 | Framework | Spring Boot **4.1.1** (Spring MVC, Spring Security, Spring Data JPA) |
-| Langage | Java **17** |
+| Langage | Java **25** (compilation en `release 25`) |
 | Build | Maven (wrapper `mvnw` / `mvnw.cmd` inclus) |
 | Vues | Thymeleaf + `thymeleaf-extras-springsecurity6` |
 | Base | **PostgreSQL** — aucune base en mémoire, pas de H2 |
@@ -82,7 +82,7 @@ Le projet expose **un seul endpoint JSON** ; tout le reste est constitué de for
 
 ## Prérequis
 
-- **JDK 17** (ou plus récent ; le projet compile en `release 17`).
+- **JDK 25** — le projet compile en `release 25`, donc un JDK plus ancien (17, 21, 23…) **ne suffit pas**.
 - **PostgreSQL** installé et démarré.
 - Rien d'autre : Maven est fourni par le wrapper (`mvnw.cmd` sous Windows, `./mvnw` sous Linux/macOS).
 
@@ -137,11 +137,16 @@ l'URL ou le mot de passe — il n'y a **pas** de repli H2.
 ## Lancer l'application
 
 ```powershell
-$env:JAVA_HOME = "C:\Program Files\Java\jdk-17"   # adapter au chemin réel
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-25"   # adapter au chemin réel
 .\mvnw.cmd spring-boot:run
 ```
 
-L'application démarre en quelques secondes sur **<http://localhost:8080>**.
+L'application démarre en quelques secondes sur **<http://localhost:8080>**. La ligne de démarrage doit
+indiquer la version de Java réellement utilisée :
+
+```
+Starting DemoApplication using Java 25.0.5 ... Started DemoApplication in 7.2 seconds
+```
 
 - Les photos sont stockées dans le dossier `uploads/` (configurable avec `app.upload.dir`).
 - Il n'y a **pas** de devtools : après une modification d'un template ou d'une classe, il faut
@@ -274,6 +279,10 @@ Résultat attendu : **27 tests, 0 échec**, `BUILD SUCCESS`.
 
 > Note : sur Spring Boot 4, `@MockBean` n'existe plus — c'est `@MockitoBean` qui le remplace
 > (`org.springframework.test.context.bean.override.mockito.MockitoBean`).
+
+> Note JDK 25 : Mockito affiche au démarrage de la suite un avertissement sur l'attachement dynamique
+> de son agent (`self-attaching ... will no longer work in future releases of the JDK`). C'est un
+> avertissement du JDK, sans conséquence ici : les **27 tests passent**.
 
 ---
 
